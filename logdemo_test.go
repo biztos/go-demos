@@ -20,7 +20,7 @@ func (lc *LogCatcher) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func TestLogging(t *testing.T) {
+func TestStructLogging(t *testing.T) {
 
 	assert := assert.New(t)
 
@@ -74,5 +74,33 @@ func TestLogging(t *testing.T) {
 		"thing-two fourth\n",
 	}
 	assert.Equal(expected, catcher.Logs, "caught all logs for both")
+
+}
+
+// Not everyone gets to have a struct...
+func TestPackageLogging(t *testing.T) {
+
+	assert := assert.New(t)
+
+	catcher := &LogCatcher{}
+	logdemo.Logger.SetOutput(catcher)
+
+	logdemo.Logger.SetFlags(0)
+	logdemo.Logger.SetPrefix("")
+
+	logdemo.Log("here")
+	assert.Equal("here\n", catcher.Last, "caught first log")
+
+	// If we have more logs we can catch them together.
+	logdemo.Log("there")
+	logdemo.Log("everywhere")
+	expected := []string{
+		"here\n",
+		"there\n",
+		"everywhere\n",
+	}
+	assert.Equal(expected, catcher.Logs, "caught all logs")
+
+	// ...and so on.  But please, use a struct if you possibly can.
 
 }
